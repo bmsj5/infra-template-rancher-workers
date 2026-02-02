@@ -1,0 +1,33 @@
+# Terraform/OpenTofu State Files
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+.terraform-outputs.json
+
+# Terraform/OpenTofu Configuration (may contain sensitive data)
+terraform.tfvars
+*.tfvars
+!terraform.tfvars.example
+
+# Terraform/OpenTofu Directories
+.terraform/
+# Note: .terraform.lock.hcl should be committed for consistent provider versions
+
+# Kubeconfig and Secrets
+output/
+*.kubeconfig
+kubeconfig.yaml
+
+# IDE and Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
