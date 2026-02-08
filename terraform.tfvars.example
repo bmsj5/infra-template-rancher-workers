@@ -17,8 +17,8 @@ ssh_key_path = "~/.ssh/id_rsa.pub"
 # RKE2 Version (optional, defaults to v1.34.2+rke2r1)
 # rke2_version = "v1.34.2+rke2r1"
 
-# Default Server Type (optional, defaults to cx23)
-# server_type = "cx23"
+# Default Server Type (optional, defaults to cx33)
+# server_type = "cx33"
 
 # Default Node Count per Cell (optional, defaults to 3)
 # node_count_per_cell = 3
@@ -26,30 +26,30 @@ ssh_key_path = "~/.ssh/id_rsa.pub"
 # Cell Definitions
 # Each cell is a separate downstream RKE2 cluster
 cells = {
-  "germany-cell-1" = {
+  "germany-cluster-1" = {
     region      = "nbg1"
     node_count  = 3
-    server_type = "cx23"
+    server_type = "cx33"
     labels = {
-      app            = "skies-dota"
+      project        = "skies-dota"
       region         = "germany"
       cluster_id     = "1"
       deployment_env = "development"
-      hub            = "true"
+      observability-hub = "true"
     }
   }
 
   # Uncomment to add Finland cell
-  # "finland-cell-1" = {
+  # "finland-cluster-1" = {
   #   region      = "fsn1"
   #   node_count  = 3
-  #   server_type = "cx23"
+  #   server_type = "cx33"
   #   labels = {
-  #     app            = "skies-dota"
+  #     project        = "skies-dota"
   #     region         = "finland"
   #     cluster_id     = "2"
   #     deployment_env = "development"
-  #     hub            = "false"
+  #     observability-hub = "false"
   #   }
   # }
 }

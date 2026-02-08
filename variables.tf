@@ -86,7 +86,7 @@ variable "cells" {
     region         = string
     labels         = map(string)
     node_count     = optional(number, 3)
-    server_type    = optional(string, "cx23")
+    server_type    = optional(string, "cx33")
   }))
   default = {}
 

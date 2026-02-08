@@ -38,6 +38,35 @@ resource "random_password" "rke2_token" {
 }
 
 # -----------------------------------------------------------------------------
+# GKE-style kubelet system-reserved CPU (by server type vCPU count)
+# -----------------------------------------------------------------------------
+# The formula: 1->60m, 2->70m, 3->75m, 4->80m, 5+->80+floor((n-4)*2.5)m
+locals {
+  server_type_cpus = {
+    "cx23" = 2
+    "cx33" = 4
+    "cx43" = 8
+    "cx53" = 16
+    "cpx22" = 2
+    "cpx32" = 4
+    "cpx42" = 8
+    "cpx52" = 16
+    "cpx62" = 32
+    "ccx13" = 2
+    "ccx23" = 4
+    "ccx33" = 8
+    "ccx43" = 16
+    "ccx53" = 32
+    "ccx63" = 64
+  }
+  reserved_cpu_m = {
+    for k, c in local.server_type_cpus : k => (
+      c == 1 ? 60 : (c == 2 ? 70 : (c == 3 ? 75 : (c == 4 ? 80 : 80 + floor((c - 4) * 2.5))))
+    )
+  }
+}
+
+# -----------------------------------------------------------------------------
 # Hetzner Cloud VMs (One per cell, multiple nodes per cell)
 # -----------------------------------------------------------------------------
 # Create a flattened map: cell_key -> node_index
@@ -64,12 +93,13 @@ resource "hcloud_server" "cell_nodes" {
   ssh_keys    = [hcloud_ssh_key.default.id]
 
   user_data = templatefile("${path.module}/templates/user-data.yaml.tpl", {
-    node_index     = each.value.node_index
-    node_count     = coalesce(each.value.cell.node_count, var.node_count_per_cell)
-    cluster_token  = random_password.rke2_token[each.value.cell_key].result
-    node_hostname  = "${each.value.cell_key}-node-${each.value.node_index + 1}"
-    ssh_public_key = data.local_file.ssh_public_key.content
-    rke2_version   = var.rke2_version
+    node_index       = each.value.node_index
+    node_count       = coalesce(each.value.cell.node_count, var.node_count_per_cell)
+    cluster_token    = random_password.rke2_token[each.value.cell_key].result
+    node_hostname    = "${each.value.cell_key}-node-${each.value.node_index + 1}"
+    ssh_public_key   = data.local_file.ssh_public_key.content
+    rke2_version     = var.rke2_version
+    reserved_cpu_m   = local.reserved_cpu_m[each.value.cell.server_type]
   })
 
 }
@@ -130,9 +160,6 @@ resource "null_resource" "configure_follower_nodes" {
 # -----------------------------------------------------------------------------
 # Register Existing RKE2 Clusters in Rancher
 # -----------------------------------------------------------------------------
-# We treat each RKE2 cell as an existing cluster and use the Rancher "import" flow.
-# rancher2_cluster creates an empty cluster object; we then apply the manifest_url
-# on the leader node to register it.
 resource "rancher2_cluster" "cells" {
   for_each = var.cells
 
@@ -140,6 +167,10 @@ resource "rancher2_cluster" "cells" {
   description = "Imported RKE2 cluster ${each.key}"
 
   labels = each.value.labels
+
+  rke2_config {
+    version = var.rke2_version
+  }
 }
 
 # -----------------------------------------------------------------------------
