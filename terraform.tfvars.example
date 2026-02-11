@@ -35,8 +35,7 @@ cells = {
       app            = "tg-bot"
       region         = "germany"
       cluster_id     = "1"
-      deployment_env = "development"
-      observability-hub = "true"
+      env            = "development"
     }
   }
 
@@ -50,8 +49,7 @@ cells = {
   #     app            = "tg-bot"
   #     region         = "finland"
   #     cluster_id     = "2"
-  #     deployment_env = "development"
-  #     observability-hub = "false"
+  #     env            = "development"
   #   }
   # }
 }
