@@ -51,6 +51,11 @@ variable "ssh_key_path" {
   }
 }
 
+variable "ssh_key_name" {
+  description = "SSH key name that will be created in the cloud security storage"
+  type        = string
+}
+
 # -----------------------------------------------------------------------------
 # Cluster Configuration
 # -----------------------------------------------------------------------------

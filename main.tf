@@ -20,7 +20,7 @@ data "local_file" "ssh_public_key" {
 
 # Hetzner Cloud SSH Key
 resource "hcloud_ssh_key" "default" {
-  name       = "rancher-workers-ssh-key"
+  name       = var.ssh_key_name
   public_key = data.local_file.ssh_public_key.content
 }
 
